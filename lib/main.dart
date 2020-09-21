@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:english_words/english_words.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_startup_app/second.dart';
 
 void main() => runApp(StartupApp());
 
@@ -10,7 +11,7 @@ class StartupApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Welcome to flutter',
+      title: "flutter startup app",
       home: RandomWords(),
       theme: ThemeData(
         primaryColor: Colors.white,
@@ -29,80 +30,50 @@ class _RandomWordsState extends State<RandomWords> {
   final _biggerFont = TextStyle(fontSize: 18);
   final _saved = Set<WordPair>();
 
-  Widget _buildSuggestions() {
-    return ListView.builder(
-        padding: EdgeInsets.all(16),
-        itemBuilder: (context, i) {
-          if (i.isOdd) return Divider();
-
-          final index = i ~/ 2;
-          if (index >= _suggestions.length) {
-            _suggestions.addAll(generateWordPairs().take(10));
-          }
-          return _buildRow(_suggestions[index]);
-        });
-  }
-
-  Widget _buildRow(WordPair wordPair) {
-    final alreadySaved = _saved.contains(wordPair);
-    return ListTile(
-      title: Text(
-        wordPair.asPascalCase,
-        style: _biggerFont,
-      ),
-      trailing: Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : null,
-      ),
-      onTap: () {
-        setState(() {
-          if (alreadySaved) {
-            _saved.remove(wordPair);
-          } else {
-            _saved.add(wordPair);
-          }
-        });
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome to flutter'),
-        actions: [IconButton(icon: Icon(Icons.list), onPressed: _pushSaved)],
+        title: Text("flutter startup app"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.list),
+            onPressed: () => startSecondPage(context, _saved),
+          ),
+        ],
       ),
-      body: _buildSuggestions(),
+      body: ListView.builder(
+        padding: EdgeInsets.all(16),
+        itemBuilder: (context, index) => _buildRow(index),
+      ),
     );
   }
 
-  void _pushSaved() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) {
-          final tiles = _saved.map(
-            (WordPair pair) {
-              return ListTile(
-                title: Text(
-                  pair.asPascalCase,
-                  style: _biggerFont,
-                ),
-              );
-            },
-          );
-          final divided = ListTile.divideTiles(
-            context: context,
-            tiles: tiles,
-          ).toList();
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Saved Suggestions'),
-            ),
-            body: ListView(children: divided),
-          );
-        },
+  Widget _buildRow(int index) {
+    if (index.isOdd) return Divider();
+
+    if (index >= _suggestions.length) {
+      _suggestions.addAll(generateWordPairs().take(10));
+    }
+    final _alreadySaved = _saved.contains(_suggestions[index]);
+    return ListTile(
+      title: Text(
+        _suggestions[index].asPascalCase,
+        style: _biggerFont,
       ),
+      trailing: Icon(
+        _alreadySaved ? Icons.favorite : Icons.favorite_border,
+        color: _alreadySaved ? Colors.red : null,
+      ),
+      onTap: () {
+        setState(() {
+          if (_alreadySaved) {
+            _saved.remove(_suggestions[index]);
+          } else {
+            _saved.add(_suggestions[index]);
+          }
+        });
+      },
     );
   }
 }
