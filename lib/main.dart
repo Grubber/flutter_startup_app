@@ -12,7 +12,11 @@ class StartupApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: "flutter startup app",
-      home: RandomWords(),
+      initialRoute: "/",
+      routes: {
+        "/": (_) => RandomWords(),
+        SecondPage.routeName: (_) => SecondPage(),
+      },
       theme: ThemeData(
         primaryColor: Colors.white,
       ),
@@ -37,14 +41,17 @@ class _RandomWordsState extends State<RandomWords> {
         title: Text("flutter startup app"),
         actions: [
           IconButton(
-            icon: Icon(Icons.list),
-            onPressed: () => startSecondPage(context, _saved),
-          ),
+              icon: Icon(Icons.list),
+              onPressed: () => Navigator.pushNamed(
+                    context,
+                    SecondPage.routeName,
+                    arguments: _saved,
+                  )),
         ],
       ),
       body: ListView.builder(
         padding: EdgeInsets.all(16),
-        itemBuilder: (context, index) => _buildRow(index),
+        itemBuilder: (_, index) => _buildRow(index),
       ),
     );
   }
